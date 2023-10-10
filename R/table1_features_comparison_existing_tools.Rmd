@@ -20,15 +20,13 @@ pacman::p_load(TNRS, taxize, galah, APCalign, tidyverse, kableExtra, here)
 ### A subset of taxon strings to test across all tools
 
 ```{r}
-species <- read_csv(here("inst/extdata/species.csv"))
-species
-
-consistency <- read_csv(here("tests/testthat/benchmarks/consistency_lookup.csv"))
-consistency
+# species <- read_csv(here("inst/extdata/species.csv"))
+# species
+# 
+# consistency <- read_csv(here("tests/testthat/benchmarks/consistency_lookup.csv"))
+# consistency
 
 testing_taxa <- tibble(taxon = c("Banksia integrifolia", "Acacia aneura", "Commersonia rosea", "Grevillea umbellulata subsp. acerosa", "Fabaceae sp.", "Dryandra sp.", "Athrotaxis laxiflolia", "Galactia striata", "Hibbertia stricta", "Ecalypha indica australis"))
-
-
 ```
 
 ### {APCalign}
@@ -105,7 +103,9 @@ rownames(features) <- c("APCalign", "taxize", "TNRS", "galah")
 
 features |> 
   kable(align = "c") |> 
-  kable_classic() 
+  kable_classic() |> 
+  as_image(width = 4, file = here("output/table1_features.png"),
+           zoom = 2)
 
 
   # add_header_above(c(" " = 1))

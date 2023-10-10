@@ -47,3 +47,8 @@ po/*~
 
 # RStudio Connect folder
 rsconnect/
+
+# Don't track htmls
+*.html
+
+
