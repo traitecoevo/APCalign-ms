@@ -1,0 +1,113 @@
+---
+title: "Features of APCalign"
+author: "Fonti Kar"
+date: "2023-10-05"
+output: html_document
+---
+
+Other tools: 
+
+- TNRS
+- taxize
+- ALA
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+pacman::p_load(TNRS, taxize, galah, APCalign, tidyverse, kableExtra, here)
+```
+
+### A subset of taxon strings to test across all tools
+
+```{r}
+species <- read_csv(here("inst/extdata/species.csv"))
+species
+
+consistency <- read_csv(here("tests/testthat/benchmarks/consistency_lookup.csv"))
+consistency
+
+testing_taxa <- tibble(taxon = c("Banksia integrifolia", "Acacia aneura", "Commersonia rosea", "Grevillea umbellulata subsp. acerosa", "Fabaceae sp.", "Dryandra sp.", "Athrotaxis laxiflolia", "Galactia striata", "Hibbertia stricta", "Ecalypha indica australis"))
+
+
+```
+
+### {APCalign}
+
+```{r}
+resources <- load_taxonomic_resources("stable")
+
+apcalign_output <- create_taxonomic_update_lookup(testing_taxa$taxon, resources = resources)
+
+apcalign_output_full <- create_taxonomic_update_lookup(testing_taxa$taxon, resources = resources, full = TRUE)
+
+apcalign_output
+```
+
+### {TNRS}
+
+R package wrapper around the TNRS API. Web application found [here](https://tnrs.biendata.org/). Source code for [R package](https://github.com/EnquistLab/RTNRS)
+
+```{r}
+tnrs_output <- TNRS(testing_taxa$taxon)
+
+tnrs_output
+```
+
+### {taxize}
+
+```{r}
+resolve_gnr_output <- resolve(testing_taxa$taxon, db = "gnr")
+
+resolve_gnr_output |>
+  as_tibble() |> 
+  print(n = Inf)
+```
+
+### {galah}
+
+Not exactly a taxon name resolver but users downloading biodiversity data would typically then use the ALA taxonomy 
+
+```{r}
+galah_config(atlas = "Australia")
+
+galah_output <- search_taxa(testing_taxa |> rename(scientificName = taxon))
+
+galah_output
+```
+
+
+## Make a features table
+
+- Batch processing (Handles multiple names all at once)
+- Fuzzy Matching
+- Adjustments to Fuzzy matching
+- Updates synonyms
+- User Interface
+- API
+- Handles infraspecific taxa
+- Handles taxonomic splits 
+- Handles higher taxonomy
+- Returns alternative taxa
+
+```{r}
+options(knitr.kable.NA = '')
+features <- data.frame(`Batch processing` = "X",
+                       `Fuzzy matching` = "X",
+                       `Adjustable fuzzy matching` = c("X", rep(NA, 3)),
+                       `Updates synonyms` = "X",
+                       `User interface` = c("X", NA, "X", NA),
+                       `Handles infraspecific taxa` = c("X", NA, "X", "X"),
+                       `Handles higher taxonomy` = "X",
+                       `Handles taxonomic splits ` = c("X", rep(NA, 3)),
+                       check.names = FALSE) 
+
+rownames(features) <- c("APCalign", "taxize", "TNRS", "galah")
+
+features |> 
+  kable(align = "c") |> 
+  kable_classic() 
+
+
+  # add_header_above(c(" " = 1))
+```
+
