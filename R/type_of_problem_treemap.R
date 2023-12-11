@@ -4,20 +4,27 @@ library(treemap)
 library(tidyverse)
 
 
-a<-read_csv("data/AusTraits_alignment_summary.csv")
-
-extract_and_concatenate_numbers_with_char <- function(input_string) {
-  # Extract numbers and the following character
-  numbers_list <- str_extract_all(input_string, "(\\d+\\D)")
-  
-  # Flatten the list to a vector
-  numbers_vector <- unlist(numbers_list)
-  
-  # Concatenate all numbers with their following character into a single string
-  return(paste0(numbers_vector, collapse = ""))
-}
-
-a$code_number<-substr(sapply(a$alignment_code,extract_and_concatenate_numbers),1,3)
+a<-read_csv("data/austraits_name_summary.csv")
 
 
-treemap(a,index = "code_number",vSize="count",fontsize.labels=32)
+treemap(a,index = "z",vSize="counter",vColor = `Name handling class`,type="categorical",fontsize.labels=32)
+
+a$ `Name handling class`<-as.factor(a$`Name handling class`)
+
+num_colors <- length(unique(a$`Name handling class`))
+subdued_rainbow_palette <- hcl(seq(15, 375, length = num_colors + 1), 
+                               l = 65, c = 100)[1:num_colors]
+
+png("treemap.png",width=11, height = 5, res = 450,units="in")
+treemap(
+  a,
+  index = "z",         # Column for labels
+  vSize = "counter",   # Column for size
+  vColor = "Name handling class",
+  type="categorical", # Column for color
+  fontsize.labels = 12, # Adjust label font size as needed
+  border.col = "white", # Color of the borders (change as desired)
+  title = "Types of corrections in the AusTraits data assembly process",
+  palette = subdued_rainbow_palette
+)
+dev.off()
