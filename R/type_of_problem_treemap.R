@@ -7,9 +7,45 @@ library(tidyverse)
 a<-read_csv("data/austraits_name_summary.csv")
 
 
-treemap(a,index = "z",vSize="counter",vColor = `Name handling class`,type="categorical",fontsize.labels=32)
 
-a$ `Name handling class`<-as.factor(a$`Name handling class`)
+a$`Name handling class`<-as.factor(a$`Name handling class`)
+
+# Calculate the sums for each 'Name handling class'
+class_counts <- a %>%
+  group_by(`Name handling class`) %>%
+  summarise(Total = sum(counter)) %>%
+  ungroup()
+
+
+overall_total <- sum(class_counts$Total)
+
+# Create a new string with the class name and the percentage
+class_counts <- class_counts %>%
+  mutate(Percentage = (Total / overall_total) * 100,
+         Label = paste(`Name handling class`, sprintf("(%0.2f%%)", Percentage)))
+
+# Create a lookup table to match the old class names with the new labels
+lookup_table <- class_counts %>%
+  select(`Name handling class`, Label)
+
+# Join this back to the original data to create a new factor
+a <- a %>%
+  left_join(lookup_table) %>%
+  mutate(`Name handling class` = as.factor(Label))
+
+
+class_sums <- a %>%
+  group_by(`Name handling class`) %>%
+  summarise(Total = sum(counter)) %>%
+  arrange(-Total) %>%
+  ungroup()
+
+
+
+# Order the factor levels based on the sums
+a$`Name handling class` <- factor(a$`Name handling class`, levels = class_sums$`Name handling class`)
+
+
 
 num_colors <- length(unique(a$`Name handling class`))
 subdued_rainbow_palette <- hcl(seq(15, 375, length = num_colors + 1), 
