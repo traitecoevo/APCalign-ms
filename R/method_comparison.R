@@ -6,7 +6,6 @@ library(tidyverse)
 library(TNRS)
 library(kewr)
 library(APCalign)
-library(galah)
 library(taxize)
 resources<-load_taxonomic_resources()
 
@@ -21,6 +20,7 @@ do_comparison <- function(species_in) {
     create_taxonomic_update_lookup(species_in, resources = resources) %>%
     select(original_name, suggested_name)
   
+
   kewout <- match_knms(species_in)
   kewouttidy <- tidy(kewout)
   kewouttidy %>%
@@ -32,7 +32,14 @@ do_comparison <- function(species_in) {
   
   TNRS_out %>%
     select(original_name = Name_submitted, tnrs = Accepted_name) -> tnrs_ss
-  
+ 
+  # Taxize can't handle massive lists
+  if(length(species_in) > 100){
+    species_in_ls <- split(species_in, ceiling(seq_along(species_in)/100))
+    
+    taxize_output <- purrr::map_dfr(species_in_ls, 
+                                ~resolve(.x, db = "gnr"))
+  } else
   taxize_output <- resolve(species_in, db = "gnr")
   
   taxize_tidy <- taxize_output$gnr |>  
@@ -62,3 +69,11 @@ write_csv(ange_compare,"angevin_comparison.csv")
 b<-read_csv("data/comparison_datasets/taxon_names_Kooyman_2011.csv")
 kooy_compare<-do_comparison(b$taxon_name)
 write_csv(kooy_compare,"kooy_comparison.csv")
+
+c<-read_csv("data/comparison_datasets/test_matches_alignments_updates.csv")
+alignments_compare <-do_comparison(c$original_name)
+write_csv(alignments_compare,"alignments_compare.csv")
+
+d<-read_csv("data/comparison_datasets/test_splits_synonyms.csv")
+synonyms_compare <-do_comparison(d$original_name)
+write_csv(alignments_compare,"synonyms_compare.csv")
