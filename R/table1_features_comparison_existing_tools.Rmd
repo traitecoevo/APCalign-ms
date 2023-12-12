@@ -90,16 +90,16 @@ galah_output
 ```{r}
 options(knitr.kable.NA = '')
 features <- data.frame(`Batch processing` = "X",
-                       `Fuzzy matching` = "X",
+                       `Fuzzy matching` = c("X", "X", "X", NA),
                        `Adjustable fuzzy matching` = c("X", rep(NA, 3)),
                        `Updates synonyms` = "X",
-                       `User interface` = c("X", NA, "X", NA),
+                       `User interface` = c("X", NA, "X", "X"),
                        `Handles infraspecific taxa` = c("X", NA, "X", "X"),
                        `Handles higher taxonomy` = "X",
                        `Handles taxonomic splits ` = c("X", rep(NA, 3)),
                        check.names = FALSE) 
 
-rownames(features) <- c("APCalign", "taxize", "TNRS", "galah")
+rownames(features) <- c("APCalign", "taxize", "TNRS", "kewr")
 
 features |> 
   kable(align = "c") |> 

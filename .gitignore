@@ -51,4 +51,6 @@ rsconnect/
 # Don't track htmls
 *.html
 
+*.csv
+
 

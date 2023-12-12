@@ -6,7 +6,8 @@ library(tidyverse)
 library(TNRS)
 library(kewr)
 library(APCalign)
-library(xlsx)
+library(galah)
+library(taxize)
 resources<-load_taxonomic_resources()
 
 
@@ -32,10 +33,22 @@ do_comparison <- function(species_in) {
   TNRS_out %>%
     select(original_name = Name_submitted, tnrs = Accepted_name) -> tnrs_ss
   
+  taxize_output <- resolve(species_in, db = "gnr")
+  
+  taxize_tidy <- taxize_output$gnr |>  
+    select(user_supplied_name, matched_name, score) |> 
+    rename(original_name = user_supplied_name, 
+           taxize = matched_name) |> 
+    distinct() |> 
+    group_by(original_name) |> 
+    slice_max(order_by = score, with_ties = FALSE) |> 
+    select(-score)
+  
   compare <- tibble(original_name = species_in) %>%
     left_join(apcout) %>%
     left_join(kew_only_one) %>%
-    left_join(tnrs_ss)
+    left_join(tnrs_ss) |> 
+    left_join(taxize_tidy)
 
 return(compare)
 }
