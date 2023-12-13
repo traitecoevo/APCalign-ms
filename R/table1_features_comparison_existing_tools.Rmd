@@ -87,16 +87,24 @@ galah_output
 - Handles higher taxonomy
 - Returns alternative taxa
 
+
+TNRS does taxon rank, 
+adding some things - browser interface; handles phrase names; identifies taxon rank of name; (adds identifiers — as in our `identifier` parameter; TNRS changes `Acacia sp.` to `Acacia`.
+
 ```{r}
 options(knitr.kable.NA = '')
 features <- data.frame(`Batch processing` = "X",
+                       `Aligns taxonomic names` = "X",
+                       `Updates taxonomic names` = c("X",NA, "X", NA),
                        `Fuzzy matching` = c("X", "X", "X", NA),
                        `Adjustable fuzzy matching` = c("X", rep(NA, 3)),
-                       `Updates synonyms` = "X",
-                       `User interface` = c("X", NA, "X", "X"),
+                       `Handles synonyms` = "X",
+                       `Handles phrase names` = c("X", rep(NA, 3)),
+                       `Web browser interface` = c("X", NA, "X", "X"),
+                       `Identifies taxon rank of name` = c("X"),
                        `Handles infraspecific taxa` = c("X", NA, "X", "X"),
                        `Handles higher taxonomy` = "X",
-                       `Handles taxonomic splits ` = c("X", rep(NA, 3)),
+                       `Handles taxonomic splits` = c("X", rep(NA, 3)),
                        check.names = FALSE) 
 
 rownames(features) <- c("APCalign", "taxize", "TNRS", "kewr")

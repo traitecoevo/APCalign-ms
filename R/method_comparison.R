@@ -17,7 +17,9 @@ resources<-load_taxonomic_resources()
 
 do_comparison <- function(species_in) {
   apcout <-
-    create_taxonomic_update_lookup(species_in, resources = resources) %>%
+    create_taxonomic_update_lookup(species_in, resources = resources)
+  
+  apc_only_names <- apcout %>%
     select(original_name, suggested_name)
   
 
@@ -56,24 +58,34 @@ do_comparison <- function(species_in) {
     left_join(kew_only_one) %>%
     left_join(tnrs_ss) |> 
     left_join(taxize_tidy)
+  
+  all_output <- list(APCalign = apcout,
+                     kewr = kewout,
+                     TNRS = TNRS_out,
+                     taxize = taxize_output$gnr)
 
-return(compare)
+return(list(comparison = compare, 
+            output = all_output))
 }
 
 
 a<-read_csv("data/comparison_datasets/taxon_names_Angevin_2011.csv")
 ange_compare<-do_comparison(a$taxon_name)
-write_csv(ange_compare,"angevin_comparison.csv")
+write_csv(ange_compare$comparisons,"angevin_comparison.csv")
+saveRDS(ange_compare, "output/Angevin_tools_output.rds")
 
 
 b<-read_csv("data/comparison_datasets/taxon_names_Kooyman_2011.csv")
 kooy_compare<-do_comparison(b$taxon_name)
-write_csv(kooy_compare,"kooy_comparison.csv")
+write_csv(kooy_compare$comparisons,"kooy_comparison.csv")
+saveRDS(kooy_compare, "output/Kooyman_tools_output.rds")
 
 c<-read_csv("data/comparison_datasets/test_matches_alignments_updates.csv")
 alignments_compare <-do_comparison(c$original_name)
-write_csv(alignments_compare,"alignments_compare.csv")
+write_csv(alignments_compare$comparisons,"alignments_compare.csv")
+saveRDS(alignments_compare, "output/test_alignments_tools_output.rds")
 
 d<-read_csv("data/comparison_datasets/test_splits_synonyms.csv")
 synonyms_compare <-do_comparison(d$original_name)
-write_csv(alignments_compare,"synonyms_compare.csv")
+write_csv(alignments_compare$comparisons,"synonyms_compare.csv")
+saveRDS(synonyms_compare, "output/test_synonyms_tools_output.rds")
