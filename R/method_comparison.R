@@ -54,7 +54,7 @@ do_comparison <- function(species_in) {
     select(-score)
   
   compare <- tibble(original_name = species_in) %>%
-    left_join(apcout) %>%
+    left_join(apc_only_names) %>%
     left_join(kew_only_one) %>%
     left_join(tnrs_ss) |> 
     left_join(taxize_tidy)
