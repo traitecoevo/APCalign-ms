@@ -14,7 +14,7 @@ pacman::p_load(APCalign, dplyr, kableExtra, here)
 ### Subset of taxa 
 
 ```{r}
-testing_taxa <- tibble(taxon = c("Banksia integrifolia", "Acacia aneura", "Commersonia rosea", "Grevillea umbellulata subsp. acerosa", "Fabaceae sp.", "Dryandra sp.", "Athrotaxis laxiflolia", "Galactia striata", "Hibbertia stricta", "Ecalypha indica australis"))
+testing_taxa <- tibble(taxon = c("Banksia integrifolia", "Acacia aneura", "Commersonia rosea", "Grevillea umbellulata subsp. acerosa", "Fabaceae sp.", "Dryandra sp.", "Athrotaxis laxiflolia", "Galactia striata", "Hibbertia stricta", "Atherosperma moschatum integrifolium", "Argyrodendron Whyanbeel"))
 ```
 
 ### Load resources
@@ -83,6 +83,8 @@ splits_update_output |>
 
 ```{r}
 lookup_output <- create_taxonomic_update_lookup(testing_taxa$taxon, resources = resources)
+
+readr::write_csv(lookup_output, "output/table4_create_taxonomic_update_lookup.csv")
 ```
 
 ```{r}
